@@ -146,7 +146,7 @@ def error(update, context):
 
 
 def main():
-    updater = Updater("926295657:AAHfr2vRxTaj1G2BTIc03LiiNzZM4AaCXJc", use_context=True)
+    updater = Updater("API token", use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
