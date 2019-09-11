@@ -25,8 +25,14 @@ def start(update, context):
                       ['Varsity Night', 'VG'],
                       ['Cluster', 'Men\'s and women\'s meeting'],
                       ]
-    with open('{}.txt'.format(update.message.from_user.first_name)) as f:
-        pass
+    with open('users.txt','w+') as f:
+        now = datetime.datetime.now()
+        f.write(str(update.message.from_user.first_name))
+        f.write('\n')
+        f.write(now.strftime("%Y-%m-%d %H:%M"))
+        f.write('\n')
+        f.write('=========')
+        f.write('\n')
 
     event_markup = ReplyKeyboardMarkup(event_keyboard, one_time_keyboard=True)
 
@@ -146,7 +152,7 @@ def error(update, context):
 
 
 def main():
-    updater = Updater("926295657:AAHfr2vRxTaj1G2BTIc03LiiNzZM4AaCXJc", use_context=True)
+    updater = Updater("API KEY", use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
