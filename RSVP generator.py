@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# hello -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # This program is dedicated to the public domain under the CC0 license.
 #
 # THIS EXAMPLE HAS BEEN UPDATED TO WORK WITH THE BETA VERSION 12 OF PYTHON-TELEGRAM-BOT.
