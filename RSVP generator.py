@@ -1,28 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This program is dedicated to the public domain under the CC0 license.
-#
-# THIS EXAMPLE HAS BEEN UPDATED TO WORK WITH THE BETA VERSION 12 OF PYTHON-TELEGRAM-BOT.
-# If you're still using version 11.1.0, please see the examples at
-# https://github.com/python-telegram-bot/python-telegram-bot/tree/v11.1.0/examples
 
-"""
-First, a few callback functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
-Usage:
-Example of a bot-user conversation using ConversationHandler.
-Send /start to initiate the conversation.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
-"""
 
 import logging
 
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove,parsemode)
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove,ChatAction)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler)
 import datetime
+from time import sleep
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -36,12 +22,15 @@ CHOOSE_EVENT, CHOOSE_DATE, CHOOSE_TIME, CHOOSE_LOCATION, CHOOSE_VERSE = range(5)
 def start(update, context):
     event_keyboard = [['JC Service', 'POLITE Service'],
                       ['Combined Arrow service', 'Care group'],
-                      ['Cluster', 'Men\'s and women\'s meeting']]
+                      ['Dare Service', 'Dare Group'],
+                      ['Varsity Night', 'VG'],
+                      ['Cluster', 'Men\'s and women\'s meeting'],
+                      ]
 
     event_markup = ReplyKeyboardMarkup(event_keyboard, one_time_keyboard=True)
 
-    reply_text = "Hi! Thanks for serving in the Father's house. Let's craft that RSVP " \
-                 "so that we can get the sheep right in! \n\nWhat is this event called?"
+    reply_text = "Hi! Thanks for serving in the Father's house. 🏘 Let's craft that RSVP " \
+                 "so that we can get the sheep right in! \n\nWhat is this event called? 🤔"
 
     update.message.reply_text(reply_text, reply_markup=event_markup)
 
@@ -124,6 +113,8 @@ def choosing_verse(update, context):
     context.user_data['verse'] = verse_reference[verse]
 
     update.message.reply_text('Here\'s the RSVP:')
+    context.send_chat_action(chat_id=update.message.chat_id,action=ChatAction.TYPING)
+    sleep(1)
     update.message.reply_text(craft_RSVP(context.user_data))
 
     return ConversationHandler.END
@@ -131,9 +122,9 @@ def choosing_verse(update, context):
 
 
 def craft_RSVP(user_data):
-    RSVP = '☀️*{}*☀️ \n\n{}\n📖{}📖\n\n' \
+    RSVP = '☀️*{}*☀️ \n\n{}\n📖 {} 📖\n\n' \
            'Welcome to the Father\'s house!! 🌈⛈🎉 It has been a draining week for all of us but let\'s be expectant that we ' \
-           'will be filled as we seek after that one thing that is needful today!🌹🐧😊 \n\nDate: {}, {}\nTime: {}\nLocation: ' \
+           'will be filled as we seek after that one thing that is needful today!🌹🐧😊 \n\n📅 Date: {}, {}\n⌚ Time: {}\n📍 Location: ' \
            '{}\n\nI\'m coming!🙋‍🙋\n1.\n2.\n3.'''.format(user_data['event'], user_data['verse'],user_data['input_verse'],user_data['date'],user_data['input_date'].split()[1], user_data['time'],
                                                   user_data['location'])
 
@@ -155,10 +146,7 @@ def error(update, context):
 
 
 def main():
-    # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
-    updater = Updater("API TOKEN", use_context=True)
+    updater = Updater("926295657:AAHfr2vRxTaj1G2BTIc03LiiNzZM4AaCXJc", use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
