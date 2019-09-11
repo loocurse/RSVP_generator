@@ -4,11 +4,10 @@
 
 import logging
 
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove,ChatAction)
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler)
 import datetime
-from time import sleep
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -113,8 +112,6 @@ def choosing_verse(update, context):
     context.user_data['verse'] = verse_reference[verse]
 
     update.message.reply_text('Here\'s the RSVP:')
-    context.send_chat_action(chat_id=update.message.chat_id,action=ChatAction.TYPING)
-    sleep(1)
     update.message.reply_text(craft_RSVP(context.user_data))
 
     return ConversationHandler.END
