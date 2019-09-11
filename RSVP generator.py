@@ -25,6 +25,8 @@ def start(update, context):
                       ['Varsity Night', 'VG'],
                       ['Cluster', 'Men\'s and women\'s meeting'],
                       ]
+    with open('{}.txt'.format(update.message.from_user.first_name)) as f:
+        pass
 
     event_markup = ReplyKeyboardMarkup(event_keyboard, one_time_keyboard=True)
 
@@ -113,6 +115,7 @@ def choosing_verse(update, context):
 
     update.message.reply_text('Here\'s the RSVP:')
     update.message.reply_text(craft_RSVP(context.user_data))
+    update.message.reply_text('For any feedback/enquires, please DM me!! @loocurse')
 
     return ConversationHandler.END
 
@@ -143,7 +146,7 @@ def error(update, context):
 
 
 def main():
-    updater = Updater("API token", use_context=True)
+    updater = Updater("926295657:AAHfr2vRxTaj1G2BTIc03LiiNzZM4AaCXJc", use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
