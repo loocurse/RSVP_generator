@@ -25,9 +25,12 @@ def start(update, context):
                       ['Varsity Night', 'VG'],
                       ['Cluster', 'Men\'s and women\'s meeting'],
                       ]
-    with open('users.txt','w+') as f:
+    # write users to text file
+    with open('users.txt', 'a+') as f:
         now = datetime.datetime.now()
         f.write(str(update.message.from_user.first_name))
+        f.write(' ')
+        f.write(str(update.message.from_user.last_name))
         f.write('\n')
         f.write(now.strftime("%Y-%m-%d %H:%M"))
         f.write('\n')
@@ -36,8 +39,9 @@ def start(update, context):
 
     event_markup = ReplyKeyboardMarkup(event_keyboard, one_time_keyboard=True)
 
-    reply_text = "Hi! Thanks for serving in the Father's house. 🏘 Let's craft that RSVP " \
-                 "so that we can get the sheep right in! \n\nWhat is this event called? 🤔"
+    reply_text = "Hello! 👋 Thanks for serving in the Father's house. 🏘 Let's craft that RSVP " \
+                 "so that we can get the sheep right in! Press /cancel at anytime to stop this bot\n\n" \
+                 "What is this event called? 🤔"
 
     update.message.reply_text(reply_text, reply_markup=event_markup)
 
@@ -51,7 +55,8 @@ def choosing_event(update, context):
 
     text = update.message.text
     context.user_data['event'] = text
-    reply_text = 'Alright, sounds exciting!! What date will it be on?'
+    reply_text = 'Alright, sounds exciting!! What date will it be on?\n' \
+                 'Feel write in your own date too 😄'
 
     update.message.reply_text(reply_text, reply_markup=date_markup)
 
@@ -70,8 +75,16 @@ def get_date(day):
 def choosing_date(update, context):
     day = update.message.text
     context.user_data['input_date'] = day
-    context.user_data['date'] = get_date(day)
-    update.message.reply_text('Alright! {} would fall on {}! \n\nWhat time would it be? (e.g. 3pm)'.format(context.user_data['input_date'],context.user_data['date']))
+    if day in 'This Friday This Saturday This Sunday':
+        context.user_data['date'] = get_date(day)
+        update.message.reply_text('Alright! {} would fall on {}! \n\n'
+                                  'What time would it be? (e.g. 3pm)'.format(context.user_data['input_date'],
+                                                                             context.user_data['date']))
+
+    else:
+        context.user_data['date'] = day
+        update.message.reply_text('Alright! {} it is! 😀\n\n'
+                                  'What time would it be? (e.g. 3pm)'.format(context.user_data['input_date']))
 
     return CHOOSE_TIME
 
@@ -83,7 +96,8 @@ def choosing_time(update, context):
     time = update.message.text
     context.user_data['time'] = time
 
-    update.message.reply_text('Where would it be held at?\nYou can type in a custom location if it\'s not below', reply_markup=location_markup)
+    update.message.reply_text('Where would it be held at?\n'
+                              'You can type in a custom location if it\'s not below', reply_markup=location_markup)
 
     return CHOOSE_LOCATION
 
@@ -121,7 +135,7 @@ def choosing_verse(update, context):
 
     update.message.reply_text('Here\'s the RSVP:')
     update.message.reply_text(craft_RSVP(context.user_data))
-    update.message.reply_text('For any feedback/enquires, please DM me!! @loocurse')
+    update.message.reply_text('For any feedback/enquires, please DM me!! @loocurse', reply_markup=ReplyKeyboardRemove())
 
     return ConversationHandler.END
 
@@ -129,8 +143,8 @@ def choosing_verse(update, context):
 
 def craft_RSVP(user_data):
     RSVP = '☀️*{}*☀️ \n\n{}\n📖 {} 📖\n\n' \
-           'Welcome to the Father\'s house!! 🌈⛈🎉 It has been a draining week for all of us but let\'s be expectant that we ' \
-           'will be filled as we seek after that one thing that is needful today!🌹🐧😊 \n\n📅 Date: {}, {}\n⌚ Time: {}\n📍 Location: ' \
+           'Welcome to the Father\'s house!! 🌈⛈🎉 Let\'s be expectant that we ' \
+           'will be filled as we seek after that one thing that is needful!🌹🐧😊 \n\n📅 Date: {}, {}\n⌚ Time: {}\n📍 Location: ' \
            '{}\n\nI\'m coming!🙋‍🙋\n1.\n2.\n3.'''.format(user_data['event'], user_data['verse'],user_data['input_verse'],user_data['date'],user_data['input_date'].split()[1], user_data['time'],
                                                   user_data['location'])
 
@@ -140,7 +154,7 @@ def craft_RSVP(user_data):
 def cancel(update, context):
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
-    update.message.reply_text('Bye! I hope we can talk again some day.',
+    update.message.reply_text('Aww, see ya soon! 🥰',
                               reply_markup=ReplyKeyboardRemove())
 
     return ConversationHandler.END
@@ -152,7 +166,7 @@ def error(update, context):
 
 
 def main():
-    updater = Updater("API KEY", use_context=True)
+    updater = Updater("API TOKEN", use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -162,25 +176,30 @@ def main():
         entry_points=[CommandHandler('start', start)],
 
         states={
-            CHOOSE_EVENT: [MessageHandler(Filters.all,
+            CHOOSE_EVENT: [CommandHandler('cancel', cancel),
+                           MessageHandler(Filters.all,
                                           choosing_event),
                            ],
 
-            CHOOSE_DATE: [MessageHandler(Filters.all,
+            CHOOSE_DATE: [CommandHandler('cancel', cancel),
+                          MessageHandler(Filters.all,
                                          choosing_date),
                           ],
 
-            CHOOSE_TIME: [MessageHandler(Filters.all,
+            CHOOSE_TIME: [CommandHandler('cancel', cancel),
+                          MessageHandler(Filters.all,
                                          choosing_time),
                           ],
 
-            CHOOSE_LOCATION: [MessageHandler(Filters.all,
+            CHOOSE_LOCATION: [CommandHandler('cancel', cancel),
+                              MessageHandler(Filters.all,
                                              choosing_location),
                               ],
 
-            CHOOSE_VERSE: [MessageHandler(Filters.all,
+            CHOOSE_VERSE: [CommandHandler('cancel', cancel),
+                           MessageHandler(Filters.all,
                                              choosing_verse),
-                              ],
+                           ],
 
         },
 
