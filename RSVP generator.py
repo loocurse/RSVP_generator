@@ -32,6 +32,8 @@ def start(update, context):
         f.write(' ')
         f.write(str(update.message.from_user.last_name))
         f.write('\n')
+        f.write(str(update.message.from_user.username))
+        f.write('\n')
         f.write(now.strftime("%Y-%m-%d %H:%M"))
         f.write('\n')
         f.write('=========')
@@ -90,7 +92,7 @@ def choosing_date(update, context):
 
 
 def choosing_time(update, context):
-    location_keyboard = [['Shine Auditorium'], ['Star Studio'], ['MBS']]
+    location_keyboard = [['Shine Auditorium'], ['Star Studio'], ['MBS'], ['Capitol Theatre']]
     location_markup = ReplyKeyboardMarkup(location_keyboard, one_time_keyboard=True)
 
     time = update.message.text
@@ -151,6 +153,13 @@ def craft_RSVP(user_data):
     return RSVP
 
 
+def config(update, context):
+    with open('users.txt', 'r') as f:
+        user_list = f.read()
+    update.message.reply_text(user_list,
+                              reply_markup=ReplyKeyboardRemove())
+    return ConversationHandler.END
+
 def cancel(update, context):
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
@@ -173,7 +182,8 @@ def main():
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
+        entry_points=[CommandHandler('start', start),
+                      CommandHandler('config', config)],
 
         states={
             CHOOSE_EVENT: [CommandHandler('cancel', cancel),
