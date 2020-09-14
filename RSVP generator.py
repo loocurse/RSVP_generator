@@ -144,7 +144,7 @@ def choosing_verse(update, context):
 
 
 def craft_RSVP(user_data):
-    RSVP = '☀️*{}*☀️ \n\n{}\n📖 {} 📖\n\n' \
+    RSVP = '☀️ *{}* ☀️  \n\n{}\n📖 {} 📖\n\n' \
            'Welcome to the Father\'s house!! 🌈⛈🎉 Let\'s be expectant that we ' \
            'will be filled as we seek after that one thing that is needful!🌹🐧😊 \n\n📅 Date: {}, {}\n⌚ Time: {}\n📍 Location: ' \
            '{}\n\nI\'m coming!🙋‍🙋\n1.\n2.\n3.'''.format(user_data['event'], user_data['verse'],user_data['input_verse'],user_data['date'],user_data['input_date'].split()[1], user_data['time'],
@@ -156,7 +156,8 @@ def craft_RSVP(user_data):
 def config(update, context):
     with open('users.txt', 'r') as f:
         user_list = f.read()
-    update.message.reply_text(user_list,
+        user_list_truncated = user_list[-4000:]
+    update.message.reply_text(user_list_truncated,
                               reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
@@ -175,7 +176,7 @@ def error(update, context):
 
 
 def main():
-    updater = Updater("API TOKEN", use_context=True)
+    updater = Updater("919149365:AAH6m3jqhM7whpm7M8Cm4EBLRHHvby2SjGA", use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
